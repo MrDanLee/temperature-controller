@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TemperatureDisplay from "./components/TemperatureDisplay";
 import TemperatureControls from "./components/TemperatureControls";
 import HistoryList from "./components/HistoryList";
 
 export default function App() {
   const [temperature, setTemperature] = useState(20);
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState(
+    () => JSON.parse(localStorage.getItem("tempHistory")) || []
+  );
+
+  useEffect(() => {
+    localStorage.setItem("tempHistory", JSON.stringify(history));
+  }, [history]);
 
   const addToHistory = (newTemp) => {
     const time = new Date().toLocaleTimeString();
@@ -13,12 +19,14 @@ export default function App() {
   };
 
   const increase = () => {
+    if (temperature >= 40) return;
     const newTemp = temperature + 1;
     setTemperature(newTemp);
     addToHistory(newTemp);
   };
 
   const decrease = () => {
+    if (temperature <= 0) return;
     const newTemp = temperature - 1;
     setTemperature(newTemp);
     addToHistory(newTemp);
